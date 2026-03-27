@@ -1,0 +1,228 @@
+version: "3.9"
+
+networks:
+  kiosk-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  mongo-data:
+  redis-data:
+  minio-data:
+  ollama-models:
+
+services:
+  # ═══════════════════════════════════════
+  #  INFRASTRUCTURE
+  # ═══════════════════════════════════════
+
+  gateway:
+    build: ./gateway
+    container_name: kiosk-gateway
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - auth
+      - orders
+      - inventory
+      - ai
+      - payment
+      - crm
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7
+    container_name: kiosk-mongodb
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+    command: mongod --quiet --logpath /dev/null
+
+  redis:
+    image: redis:7-alpine
+    container_name: kiosk-redis
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: kiosk-minio
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-kiosk-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-change-me-minio-secret}
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  # ═══════════════════════════════════════
+  #  FRONTEND
+  # ═══════════════════════════════════════
+
+  frontend:
+    build: ./frontend
+    container_name: kiosk-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  # ═══════════════════════════════════════
+  #  APPLICATION SERVICES
+  # ═══════════════════════════════════════
+
+  auth:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    container_name: kiosk-auth
+    ports:
+      - "8001:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017}
+      - MONGO_DB_AUTH=${MONGO_DB_AUTH:-kiosk_auth}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - JWT_EXPIRY_MINUTES=${JWT_EXPIRY_MINUTES:-30}
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  orders:
+    build:
+      context: .
+      dockerfile: services/orders/Dockerfile
+    container_name: kiosk-orders
+    ports:
+      - "8002:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017}
+      - MONGO_DB_ORDERS=${MONGO_DB_ORDERS:-kiosk_orders}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+      - TAX_PERCENT=${TAX_PERCENT:-5.0}
+    depends_on:
+      - mongodb
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  inventory:
+    build:
+      context: .
+      dockerfile: services/inventory/Dockerfile
+    container_name: kiosk-inventory
+    ports:
+      - "8003:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017}
+      - MONGO_DB_INVENTORY=${MONGO_DB_INVENTORY:-kiosk_inventory}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+    depends_on:
+      - mongodb
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  ai:
+    build:
+      context: .
+      dockerfile: services/ai/Dockerfile
+    container_name: kiosk-ai
+    ports:
+      - "8004:8000"
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-mistral:7b-instruct-v0.3-q4_K_M}
+      - WHISPER_MODEL=${WHISPER_MODEL:-small}
+      - WHISPER_DEVICE=${WHISPER_DEVICE:-cpu}
+    volumes:
+      - ./services/ai/models:/app/models
+    depends_on:
+      - ollama
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  payment:
+    build:
+      context: .
+      dockerfile: services/payment/Dockerfile
+    container_name: kiosk-payment
+    ports:
+      - "8005:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017}
+      - MONGO_DB_PAYMENT=${MONGO_DB_PAYMENT:-kiosk_payment}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+      - UPI_MERCHANT_ID=${UPI_MERCHANT_ID:-merchant@upi}
+      - UPI_MERCHANT_NAME=${UPI_MERCHANT_NAME:-KioskShop}
+    depends_on:
+      - mongodb
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  crm:
+    build:
+      context: .
+      dockerfile: services/crm/Dockerfile
+    container_name: kiosk-crm
+    ports:
+      - "8006:8000"
+    environment:
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017}
+      - MONGO_DB_CRM=${MONGO_DB_CRM:-kiosk_crm}
+      - MONGO_DB_ORDERS=${MONGO_DB_ORDERS:-kiosk_orders}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+    depends_on:
+      - mongodb
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+
+  # ═══════════════════════════════════════
+  #  AI MODELS
+  # ═══════════════════════════════════════
+
+  ollama:
+    image: ollama/ollama
+    container_name: kiosk-ollama
+    volumes:
+      - ollama-models:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - kiosk-net
+    restart: unless-stopped
+    # Uncomment below for GPU support:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
