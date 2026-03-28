@@ -17,17 +17,20 @@ const aisleLabels: Record<string, string> = {
 export default function StoreMapPage() {
   const [highlight, setHighlight] = useState<string | null>(null)
 
-  const products = [
+  const [products, setProducts] = useState<any[]>([])
+
+  // Top quick-find categories mapping to backend schema
+  const categories = [
     { name: 'Rice', cell: '1A' },
-    { name: 'Dal', cell: '1B' },
-    { name: 'Oil', cell: '2A' },
-    { name: 'Milk', cell: '2B' },
-    { name: 'Bread', cell: '3A' },
-    { name: 'Tea', cell: '3B' },
-    { name: 'Snacks', cell: '4A' },
-    { name: 'Salt / Sugar', cell: '4B' },
-    { name: 'Soap', cell: '5A' },
-    { name: 'Toothpaste', cell: '5B' },
+    { name: 'Dal & Pulses', cell: '1B' },
+    { name: 'Oils', cell: '2A' },
+    { name: 'Dairy', cell: '2B' },
+    { name: 'Snacks & Biscuits', cell: '3A' },
+    { name: 'Beverages', cell: '3B' },
+    { name: 'Personal Care', cell: '4A' },
+    { name: 'Spices & Salt', cell: '4B' },
+    { name: 'Cleaning', cell: '5A' },
+    { name: 'Oral Care', cell: '5B' },
   ]
 
   return (
@@ -39,11 +42,11 @@ export default function StoreMapPage() {
 
       {/* Product quick find */}
       <div className="chip-scroll mb-2">
-        {products.map(p => (
-          <button key={p.cell} className={`chip ${highlight === p.cell ? 'active' : ''}`}
-            onClick={() => setHighlight(p.cell)}>
-            <span className="chip-icon">{aisleLabels[p.cell]}</span>
-            <span className="chip-label">{p.name}</span>
+        {categories.map(c => (
+          <button key={c.cell} className={`chip ${highlight === c.cell ? 'active' : ''}`}
+            onClick={() => setHighlight(c.cell)}>
+            <span className="chip-icon">{aisleLabels[c.cell]}</span>
+            <span className="chip-label">{c.name}</span>
           </button>
         ))}
       </div>

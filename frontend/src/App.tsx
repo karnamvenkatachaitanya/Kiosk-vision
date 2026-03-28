@@ -4,6 +4,7 @@ import TopBar from './components/layout/TopBar'
 import BottomNav from './components/layout/BottomNav'
 import VoiceFAB from './components/voice/VoiceFAB'
 import VoiceOverlay from './components/voice/VoiceOverlay'
+import AuthModal from './components/auth/AuthModal'
 
 /* ── Guest / Customer Pages ── */
 import HomePage from './pages/guest/HomePage'
@@ -40,7 +41,7 @@ function App() {
   }, [])
 
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="app-shell">
         <TopBar />
         <main className="page-content">
@@ -79,6 +80,7 @@ function App() {
         <BottomNav />
         <VoiceFAB />
         <VoiceOverlay />
+        <AuthModal />
       </div>
     </BrowserRouter>
   )

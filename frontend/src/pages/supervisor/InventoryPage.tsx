@@ -1,16 +1,26 @@
-const products = [
-  { id: 'p001', name: 'Basmati Rice (5kg)', emoji: '🌾', stock: 50, status: 'ok' },
-  { id: 'p002', name: 'Wheat Flour (1kg)', emoji: '🌾', stock: 100, status: 'ok' },
-  { id: 'p003', name: 'Sugar (1kg)', emoji: '🧂', stock: 8, status: 'low' },
-  { id: 'p004', name: 'Toor Dal (1kg)', emoji: '🫘', stock: 60, status: 'ok' },
-  { id: 'p005', name: 'Sunflower Oil (1L)', emoji: '🫒', stock: 3, status: 'critical' },
-  { id: 'p006', name: 'Milk (500ml)', emoji: '🥛', stock: 30, status: 'ok' },
-  { id: 'p007', name: 'White Bread', emoji: '🍞', stock: 5, status: 'low' },
-  { id: 'p008', name: 'Tea (250g)', emoji: '🍵', stock: 45, status: 'ok' },
-]
+import { useState, useEffect } from 'react'
+import { inventoryAPI } from '../../services/api'
 
 export default function InventoryPage() {
-  const lowStock = products.filter(p => p.status !== 'ok')
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await inventoryAPI.listProducts()
+        setProducts(res.data)
+      } catch (e) {
+        console.error("Failed to load inventory:", e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  // Calculate live low-stock metrics (below minimum threshold)
+  const lowStock = products.filter(p => p.stock_quantity <= (p.min_stock_level || 15))
 
   return (
     <div className="anim-slide">
@@ -38,25 +48,33 @@ export default function InventoryPage() {
       </div>
 
       {/* Product list */}
-      <div className="stagger">
-        {products.map(p => (
-          <div key={p.id} className="product-card anim-scale">
-            <div className="product-emoji">{p.emoji}</div>
-            <div className="product-details">
-              <div className="product-name">{p.name}</div>
-              <div className="product-meta">
-                Stock: <span style={{
-                  color: p.status === 'critical' ? 'var(--accent-red)' : p.status === 'low' ? 'var(--accent-orange)' : 'var(--accent-green)',
-                  fontWeight: 700
-                }}>{p.stock}</span>
+      {loading ? (
+        <div className="stagger" style={{ opacity: 0.5 }}>Loading live database...</div>
+      ) : (
+        <div className="stagger">
+          {products.map(p => {
+             const isCritical = p.stock_quantity <= (p.min_stock_level || 15) / 2
+             const isLow = p.stock_quantity <= (p.min_stock_level || 15)
+             return (
+              <div key={p._id || p.id} className="product-card anim-scale">
+                <div className="product-emoji">📦</div>
+                <div className="product-details">
+                  <div className="product-name">{p.name || "Unknown Product"}</div>
+                  <div className="product-meta">
+                    Stock: <span style={{
+                      color: isCritical ? 'var(--accent-red)' : isLow ? 'var(--accent-orange)' : 'var(--accent-green)',
+                      fontWeight: 700
+                    }}>{p.stock_quantity}</span>
+                  </div>
+                </div>
+                <span className={`badge ${isCritical ? 'badge-red' : isLow ? 'badge-orange' : 'badge-green'}`}>
+                  {isCritical ? '🔴 Critical' : isLow ? '🟡 Low' : '🟢 OK'}
+                </span>
               </div>
-            </div>
-            <span className={`badge ${p.status === 'critical' ? 'badge-red' : p.status === 'low' ? 'badge-orange' : 'badge-green'}`}>
-              {p.status === 'critical' ? '🔴 Critical' : p.status === 'low' ? '🟡 Low' : '🟢 OK'}
-            </span>
-          </div>
-        ))}
-      </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

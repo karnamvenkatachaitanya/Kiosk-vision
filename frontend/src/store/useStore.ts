@@ -22,6 +22,7 @@ export interface AppState {
   userName: string | null
   rewardPoints: number
   isAuthenticated: boolean
+  isAuthModalOpen: boolean
 
   /* Cart */
   cartItems: CartItem[]
@@ -43,6 +44,8 @@ export interface AppState {
   lastIntent: string
 
   /* Actions */
+  openAuthModal: () => void
+  closeAuthModal: () => void
   setAuth: (token: string, userId: string, role: UserRole, name?: string) => void
   logout: () => void
   addToCart: (item: CartItem) => void
@@ -69,6 +72,7 @@ export const useStore = create<AppState>((set, get) => ({
   userName: localStorage.getItem('kv_name'),
   rewardPoints: 0,
   isAuthenticated: !!localStorage.getItem('kv_token'),
+  isAuthModalOpen: false,
 
   /* ── Cart ── */
   cartItems: [],
@@ -90,12 +94,15 @@ export const useStore = create<AppState>((set, get) => ({
   lastIntent: '',
 
   /* ── Actions ── */
+  openAuthModal: () => set({ isAuthModalOpen: true }),
+  closeAuthModal: () => set({ isAuthModalOpen: false }),
+
   setAuth: (token, userId, role, name) => {
     localStorage.setItem('kv_token', token)
     localStorage.setItem('kv_uid', userId)
     localStorage.setItem('kv_role', role)
     if (name) localStorage.setItem('kv_name', name)
-    set({ token, userId, role, userName: name || null, isAuthenticated: true })
+    set({ token, userId, role, userName: name || null, isAuthenticated: true, isAuthModalOpen: false })
   },
 
   logout: () => {

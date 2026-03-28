@@ -47,25 +47,41 @@ export const inventoryAPI = {
   getLocation: (id: string) => api.get(`/inventory/products/${id}/location`),
   getCategories: () => api.get('/inventory/categories'),
   listProducts: (category?: string) =>
-    api.get(`/inventory/products${category ? `?category=${category}` : ''}`),
+    api.get(`/inventory/products?limit=200${category ? `&category=${category}` : ''}`),
 }
 
-// AI API
+// AI API (Lightweight – STT/TTS handled by Browser Web Speech API)
 export const aiAPI = {
-  speechToText: (audioBase64: string, language = 'en') =>
-    api.post('/ai/speech-to-text', { audio_base64: audioBase64, language }),
-  textToSpeech: (text: string) =>
-    api.post('/ai/text-to-speech', { text }),
+  // OCR via backend (Tesseract)
   ocr: (imageBase64: string, mode = 'printed') =>
     api.post('/ai/ocr', { image_base64: imageBase64, mode }),
   ocrShoppingList: (imageBase64: string) =>
     api.post('/ai/ocr/shopping-list', { image_base64: imageBase64, mode: 'handwritten' }),
+
+  // Intent parsing via backend (rule-based, lightweight)
   parseIntent: (text: string) =>
     api.post('/ai/intent', { text }),
-  recognizeGesture: (imageBase64: string) =>
-    api.post('/ai/gesture', { image_base64: imageBase64 }),
+
+  // Barcode decoding via backend (PyZBar)
   decodeBarcode: (imageBase64: string) =>
     api.post('/ai/barcode', { image_base64: imageBase64 }),
+
+  // Browser-based TTS helper (uses pre-cached voices for instant playback)
+  speak: (text: string) => {
+    if (!window.speechSynthesis) return
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.rate = 1.1
+    utterance.pitch = 1.05
+    // Use voices already loaded by the browser (cached after voiceschanged event)
+    const voices = window.speechSynthesis.getVoices()
+    const preferred = voices.find(
+      (v) => v.lang.startsWith('en') && v.name.includes('Google')
+    ) || voices.find((v) => v.lang.startsWith('en') && !v.localService)
+      || voices.find((v) => v.lang.startsWith('en'))
+    if (preferred) utterance.voice = preferred
+    window.speechSynthesis.speak(utterance)
+  },
 }
 
 // Payment API

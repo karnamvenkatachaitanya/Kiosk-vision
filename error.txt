@@ -1,0 +1,254 @@
+﻿python : INFO:     
+Started server process 
+[10732]
+At line:1 char:1
++ python -m uvicorn 
+app.main:app --host 
+0.0.0.0 --port 8099 
+--app-dir s ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (I  
+  NFO:     Started serv   
+ er process [10732]:St    
+ring) [], RemoteExcep    
+tion
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+INFO:     Waiting for 
+application startup.
+ERROR:    Traceback (most 
+recent call last):
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\starlette
+\routing.py", line 693, 
+in lifespan
+    async with self.lifesp
+an_context(app) as 
+maybe_state:
+               
+~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Program Files\W
+indowsApps\PythonSoftwareF
+oundation.Python.3.13_3.13
+.3312.0_x64__qbz5n2kfra8p0
+\Lib\contextlib.py", line 
+214, in __aenter__
+    return await 
+anext(self.gen)
+           
+^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\venka\Des
+ktop\Kiosk\services\invent
+ory\app\main.py", line 
+36, in lifespan
+    await 
+db.products.create_index([
+    ...<4 lines>...
+    ])
+  File "C:\Program Files\W
+indowsApps\PythonSoftwareF
+oundation.Python.3.13_3.13
+.3312.0_x64__qbz5n2kfra8p0
+\Lib\concurrent\futures\th
+read.py", line 59, in run
+    result = 
+self.fn(*self.args, 
+**self.kwargs)
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\pymongo\s
+ynchronous\collection.py",
+ line 2387, in 
+create_index
+    return (self._create_i
+ndexes([index], session, 
+**cmd_options))[0]
+            ~~~~~~~~~~~~~~
+~~~~~~^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\pymongo\_
+csot.py", line 125, in 
+csot_wrapper
+    return func(self, 
+*args, **kwargs)
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\pymongo\s
+ynchronous\collection.py",
+ line 2261, in 
+_create_indexes
+    self._command(
+    ~~~~~~~~~~~~~^
+        conn,
+        ^^^^^
+    ...<4 lines>...
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\pymongo\s
+ynchronous\collection.py",
+ line 621, in _command
+    return conn.command(
+           ~~~~~~~~~~~~^
+        
+self._database.name,
+        
+^^^^^^^^^^^^^^^^^^^^
+    ...<12 lines>...
+        
+user_fields=user_fields,
+        
+^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\pymongo\s
+ynchronous\helpers.py", 
+line 47, in inner
+    return func(*args, 
+**kwargs)
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\pymongo\s
+ynchronous\pool.py", line 
+398, in command
+    return command(
+        self,
+    ...<20 lines>...
+        write_concern=writ
+e_concern,
+    )
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\pymongo\s
+ynchronous\network.py", 
+line 212, in command
+    helpers_shared._check_
+command_response(
+    ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~^
+        response_doc,
+        ^^^^^^^^^^^^^
+    ...<2 lines>...
+        parse_write_concer
+n_error=parse_write_concer
+n_error,
+        ^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
+    )
+    ^
+  File "C:\Users\venka\App
+Data\Local\Packages\Python
+SoftwareFoundation.Python.
+3.13_qbz5n2kfra8p0\LocalCa
+che\local-packages\Python3
+13\site-packages\pymongo\h
+elpers_shared.py", line 
+284, in 
+_check_command_response
+    raise 
+OperationFailure(errmsg, 
+code, response, 
+max_wire_version)
+pymongo.errors.OperationFa
+ilure: An equivalent 
+index already exists with 
+a different name and 
+options. Requested index: 
+{ v: 2, key: { _fts: 
+"text", _ftsx: 1 }, name: 
+"name_text_category_text_d
+escription_text_brand_name
+_text", weights: { 
+brand_name: 1, category: 
+1, description: 1, name: 
+1 }, default_language: 
+"english", 
+language_override: 
+"language", 
+textIndexVersion: 3 }, 
+existing index: { v: 2, 
+key: { _fts: "text", 
+_ftsx: 1 }, name: "name_te
+xt_category_text_descripti
+on_text_brand_text", 
+weights: { brand: 1, 
+category: 1, description: 
+1, name: 1 }, 
+default_language: 
+"english", 
+language_override: 
+"language", 
+textIndexVersion: 3 }, 
+full error: {'ok': 0.0, 
+'errmsg': 'An equivalent 
+index already exists with 
+a different name and 
+options. Requested index: 
+{ v: 2, key: { _fts: 
+"text", _ftsx: 1 }, name: 
+"name_text_category_text_d
+escription_text_brand_name
+_text", weights: { 
+brand_name: 1, category: 
+1, description: 1, name: 
+1 }, default_language: 
+"english", 
+language_override: 
+"language", 
+textIndexVersion: 3 }, 
+existing index: { v: 2, 
+key: { _fts: "text", 
+_ftsx: 1 }, name: "name_te
+xt_category_text_descripti
+on_text_brand_text", 
+weights: { brand: 1, 
+category: 1, description: 
+1, name: 1 }, 
+default_language: 
+"english", 
+language_override: 
+"language", 
+textIndexVersion: 3 }', 
+'code': 85, 'codeName': 
+'IndexOptionsConflict'}
+
+ERROR:    Application 
+startup failed. Exiting.

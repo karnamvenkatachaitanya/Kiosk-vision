@@ -22,8 +22,8 @@ services:
     build: ./gateway
     container_name: kiosk-gateway
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "8443:443"
     depends_on:
       - frontend
       - auth
@@ -83,7 +83,7 @@ services:
     build: ./frontend
     container_name: kiosk-frontend
     ports:
-      - "3000:80"
+      - "3001:80"
     networks:
       - kiosk-net
     restart: unless-stopped
@@ -156,7 +156,7 @@ services:
       - "8004:8000"
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-mistral:7b-instruct-v0.3-q4_K_M}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-phi3}
       - WHISPER_MODEL=${WHISPER_MODEL:-small}
       - WHISPER_DEVICE=${WHISPER_DEVICE:-cpu}
     volumes:

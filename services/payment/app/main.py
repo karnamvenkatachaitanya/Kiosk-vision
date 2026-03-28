@@ -17,11 +17,11 @@ from pydantic import BaseModel
 from typing import Optional
 
 import sys
-sys.path.insert(0, "/app")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from shared.middleware.auth import get_current_user, require_roles
 from shared.schemas.models import PaymentMethod, UPIQRRequest, UPIQRResponse, PaymentConfirm
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("MONGO_DB_PAYMENT", "kiosk_payment")
 UPI_MERCHANT_ID = os.getenv("UPI_MERCHANT_ID", "merchant@upi")
 UPI_MERCHANT_NAME = os.getenv("UPI_MERCHANT_NAME", "KioskShop")

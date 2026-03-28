@@ -15,7 +15,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 import sys
-sys.path.insert(0, "/app")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from shared.middleware.auth import create_token, get_current_user, require_roles
 from shared.schemas.models import UserRole, UserCreate, UserResponse, TokenResponse
 
@@ -23,7 +23,7 @@ from shared.schemas.models import UserRole, UserCreate, UserResponse, TokenRespo
 # Configuration
 # ──────────────────────────────────────
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("MONGO_DB_AUTH", "kiosk_auth")
 
 db = None

@@ -38,15 +38,20 @@ export default function BottomNav() {
   return (
     <nav className="bottom-nav" role="navigation" aria-label="Main navigation">
       <div className="bottom-nav-inner">
-        {tabs.map(t => (
-          <Link key={t.path} to={t.path}
-            className={`nav-tab ${pathname === t.path ? 'active' : ''}`}
-            aria-label={t.label}>
-            <span className="nav-emoji">{t.icon}</span>
-            <span className="nav-label">{t.label}</span>
-            {t.badge ? <span className="cart-badge">{t.badge}</span> : null}
-          </Link>
-        ))}
+        {tabs.map(t => {
+          const isActive = pathname === t.path
+          return (
+            <Link key={t.path} to={t.path}
+              className={`nav-tab ${isActive ? 'active' : ''}`}
+              aria-label={t.label}>
+              <div className={`nav-icon-wrap ${isActive ? 'active' : ''}`}>
+                <span className="nav-emoji">{t.icon}</span>
+              </div>
+              <span className="nav-label">{t.label}</span>
+              {t.badge ? <span className="cart-badge">{t.badge}</span> : null}
+            </Link>
+          )
+        })}
       </div>
     </nav>
   )

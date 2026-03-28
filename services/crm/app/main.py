@@ -13,11 +13,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 
 import sys
-sys.path.insert(0, "/app")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from shared.middleware.auth import get_current_user, require_roles
 from shared.schemas.models import SalesSummary, CustomerProfile
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("MONGO_DB_CRM", "kiosk_crm")
 DB_ORDERS = os.getenv("MONGO_DB_ORDERS", "kiosk_orders")
 

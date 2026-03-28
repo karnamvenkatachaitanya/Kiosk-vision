@@ -336,20 +336,21 @@ class OrderCreate(BaseModel):
 
 class OrderResponse(BaseModel):
     id: str
-    order_number: str
+    order_number: Optional[str] = None
     user_id: str
     items: List[OrderItem]
     subtotal: float
-    tax_amount: float
+    tax_amount: float = 0
+    tax: float = 0
     discount_amount: float = 0
     points_redeemed: int = 0
     points_value: float = 0
     points_earned: int = 0
     total: float
     status: OrderStatus
-    delivery_type: DeliveryType
+    delivery_type: DeliveryType = DeliveryType.PICKUP
     delivery_address: Optional[DeliveryAddress] = None
-    input_source: InputSource
+    input_source: InputSource = InputSource.MANUAL
     created_at: datetime
 
 
@@ -364,7 +365,7 @@ class BillGenerate(BaseModel):
 
 class BillResponse(BaseModel):
     id: str
-    bill_number: str
+    bill_number: Optional[str] = None
     order_id: str
     subtotal: float
     tax_percent: float
@@ -372,7 +373,8 @@ class BillResponse(BaseModel):
     discount_amount: float = 0
     points_redeemed: int = 0
     points_discount: float = 0
-    grand_total: float
+    total: float = 0
+    grand_total: float = 0
     payment_method: PaymentMethod
     payment_status: PaymentStatus = PaymentStatus.PENDING
     receipt_url: Optional[str] = None
