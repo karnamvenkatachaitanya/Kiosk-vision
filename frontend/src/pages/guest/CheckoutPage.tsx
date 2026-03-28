@@ -1,24 +1,11 @@
 import { useState } from 'react'
 import { useStore } from '../../store/useStore'
-import { useToast } from '../../components/ui/Toast'
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal, deliveryType, setDeliveryType, clearCart, rewardPoints } = useStore()
-  const { addToast } = useToast()
   const [step, setStep] = useState<'delivery' | 'payment' | 'done'>('delivery')
   const tax = Math.round(cartTotal * 0.05)
   const total = cartTotal + tax
-
-  const handleCompleteOrder = () => {
-    addToast({
-      title: '📦 Order Placed!',
-      message: `Successfully placed order for ₹${total}`,
-      type: 'success',
-      duration: 5000
-    })
-    clearCart()
-    setStep('done')
-  }
 
   if (step === 'done') {
     return (
@@ -90,11 +77,11 @@ export default function CheckoutPage() {
             </div>
           )}
           <div className="mega-grid stagger">
-            <button className="mega-btn accent-blue" onClick={handleCompleteOrder}>
+            <button className="mega-btn accent-blue" onClick={() => { clearCart(); setStep('done') }}>
               <span className="mega-icon">📱</span>
               <span className="mega-label">UPI / QR</span>
             </button>
-            <button className="mega-btn accent-green" onClick={handleCompleteOrder}>
+            <button className="mega-btn accent-green" onClick={() => { clearCart(); setStep('done') }}>
               <span className="mega-icon">💵</span>
               <span className="mega-label">Cash</span>
             </button>

@@ -2,234 +2,157 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../../store/useStore'
 import { useState, useEffect } from 'react'
 import { inventoryAPI } from '../../services/api'
-import { useToast } from '../../components/ui/Toast'
-import { 
-  ShoppingBag, 
-  Mic, 
-  Search, 
-  Camera, 
-  Map as MapIcon, 
-  Hand, 
-  ChevronRight, 
-  Plus,
-  Star
-} from 'lucide-react'
-import './HomePage.css'
 
 const categories = [
-  { id: 'burgers', icon: '🍔', label: 'Burgers' },
-  { id: 'pizza', icon: '🍕', label: 'Pizza' },
-  { id: 'sides', icon: '🍟', label: 'Fries' },
-  { id: 'beverages', icon: '🥤', label: 'Drinks' },
-  { id: 'desserts', icon: '🍦', label: 'Desserts' },
-  { id: 'combo', icon: '🍱', label: 'Combos' },
-  { id: 'hot_drinks', icon: '☕', label: 'Coffee' },
-  { id: 'healthy', icon: '🥗', label: 'Salads' },
+  { id: 'grains', icon: '🌾', label: 'Atta, Rice\n& Dal', bg: '#fef3e2' },
+  { id: 'dairy', icon: '🥛', label: 'Dairy, Bread\n& Eggs', bg: '#e8f5e9' },
+  { id: 'fruits', icon: '🥬', label: 'Fruits &\nVegetables', bg: '#f1f8e9' },
+  { id: 'beverages', icon: '🥤', label: 'Cold Drinks\n& Juices', bg: '#e3f2fd' },
+  { id: 'snacks', icon: '🍿', label: 'Snacks &\nMunchies', bg: '#fff8e1' },
+  { id: 'bakery', icon: '🍞', label: 'Bakery &\nBiscuits', bg: '#fce4ec' },
+  { id: 'essentials', icon: '🧂', label: 'Masala, Oil\n& More', bg: '#fff3e0' },
+  { id: 'personal_care', icon: '🧴', label: 'Personal\nCare', bg: '#f3e5f5' },
+  { id: 'oils', icon: '🫒', label: 'Cooking\nOils & Ghee', bg: '#e0f2f1' },
+  { id: 'cleaning', icon: '🧹', label: 'Cleaning\nEssentials', bg: '#e8eaf6' },
 ]
 
 const promoCards = [
-  { title: 'Mega Burger Combo', sub: '2 Burgers + Fries + 2 Cokes', emoji: '🍔', discount: '30% OFF' },
-  { title: 'Sizzling Pizzas', sub: 'Freshly baked, hot & cheesy', emoji: '🍕', discount: '20% OFF' },
-  { title: 'Sweet Cravings', sub: 'Choco Lava & Sundaes', emoji: '🍨', discount: '25% OFF' },
-]
-
-const mockFoodProducts = [
-  { _id: '1', name: 'Classic Cheeseburger', category: 'burgers', selling_price: 149, mrp: 199, unit: '1 pc', emoji: '🍔' },
-  { _id: '2', name: 'Margherita Pizza', category: 'pizza', selling_price: 299, mrp: 399, unit: '8 inch', emoji: '🍕' },
-  { _id: '3', name: 'French Fries (L)', category: 'sides', selling_price: 99, mrp: 129, unit: '1 portion', emoji: '🍟' },
-  { _id: '4', name: 'Cold Coffee', category: 'beverages', selling_price: 129, mrp: 159, unit: '250 ml', emoji: '🥤' },
-  { _id: '5', name: 'Chocolate Sundae', category: 'desserts', selling_price: 119, mrp: 149, unit: '1 pc', emoji: '🍨' },
-  { _id: '6', name: 'Mega Combo Meal', category: 'combo', selling_price: 399, mrp: 549, unit: 'Serves 2', emoji: '🍱' },
+  { title: 'Kitchen Essentials', sub: 'Spices, salt, sugar & more', bg: 'linear-gradient(135deg, #ffd54f, #ffb300)', emoji: '🧂🫙🧈', cta: 'Order Now' },
+  { title: 'Fresh Dairy Daily', sub: 'Milk, curd, paneer & cheese', bg: 'linear-gradient(135deg, #81c784, #43a047)', emoji: '🥛🧀🧈', cta: 'Order Now' },
+  { title: 'Snack Time!', sub: 'Chips, biscuits, namkeen & more', bg: 'linear-gradient(135deg, #e57373, #ef5350)', emoji: '🍪🍿🥜', cta: 'Order Now' },
 ]
 
 export default function HomePage() {
-  const { role, openAuthModal } = useStore()
+  const { role, openAuthModal, isAuthenticated, cartItems } = useStore()
   const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
   const [trending, setTrending] = useState<any[]>([])
   const { addToCart } = useStore()
-  const [heroSlide, setHeroSlide] = useState(0)
 
   useEffect(() => {
     inventoryAPI.listProducts().then(res => {
-      if (res.data && res.data.length > 0) {
-        setTrending(res.data.slice(0, 8))
-      } else {
-        setTrending(mockFoodProducts)
-      }
-    }).catch(() => {
-      setTrending(mockFoodProducts)
-    })
+      setTrending((res.data || []).slice(0, 10))
+    }).catch(() => {})
   }, [])
 
-  // Auto-rotate hero
-  useEffect(() => {
-    const timer = setInterval(() => setHeroSlide(s => (s + 1) % 3), 4000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const { addToast } = useToast()
-
-  const handleAdd = (p: any) => {
-    addToCart({ product_id: p._id || p.id, product_name: p.name, product_emoji: p.emoji || '🍔', quantity: 1, unit_price: p.selling_price || p.price, total_price: p.selling_price || p.price, added_via: 'manual' })
-    addToast({ title: `${p.emoji || '🍔'} ${p.name} added`, message: `₹${p.selling_price || p.price} · Added to cart`, type: 'success', duration: 2500 })
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) navigate(`/browse?q=${encodeURIComponent(searchQuery)}`)
   }
 
-  const heroSlides = [
-    { title: 'Craving something delicious?', sub: 'Fresh, hot meals at your fingertips', emoji: '🍔🍟🥤', bg: 'hero-slide-1' },
-    { title: 'Order in seconds', sub: 'Voice, scan, or tap — your choice', emoji: '🎙️📷👆', bg: 'hero-slide-2' },
-    { title: 'Earn rewards every bite', sub: 'Sign in to collect loyalty points', emoji: '⭐🎁💎', bg: 'hero-slide-3' },
-  ]
+  const handleAdd = (p: any) => {
+    addToCart({ product_id: p._id || p.id, product_name: p.name, product_emoji: '📦', quantity: 1, unit_price: p.selling_price || p.price, total_price: p.selling_price || p.price, added_via: 'manual' })
+  }
 
   return (
-    <div className="hp anim-fade">
-      {/* ── Hero Section ── */}
-      <section className={`hp-hero ${heroSlides[heroSlide].bg}`}>
-        <div className="hp-hero-content">
-          <h1>{heroSlides[heroSlide].title}</h1>
-          <p>{heroSlides[heroSlide].sub}</p>
-          <div className="hp-hero-actions">
-            <Link to="/browse" className="hp-hero-btn hp-hero-btn-primary">
-              <ShoppingBag size={20} />
-              Browse Menu
-            </Link>
-            <Link to="/voice" className="hp-hero-btn hp-hero-btn-outline">
-              <Mic size={20} />
-              Voice Order
-            </Link>
-          </div>
+    <div className="bk-home">
+      {/* ── Hero Banner ── */}
+      <div className="bk-hero">
+        <div className="bk-hero-content">
+          <h1>Stock up on daily essentials</h1>
+          <p>Get farm-fresh goodness & a range of exotic fruits, vegetables, eggs & more</p>
+          <Link to="/browse" className="bk-hero-btn">Shop Now</Link>
         </div>
-        <div className="hp-hero-emoji">{heroSlides[heroSlide].emoji}</div>
-        <div className="hp-hero-dots">
-          {heroSlides.map((_, i) => (
-            <button key={i} className={`hp-dot ${heroSlide === i ? 'active' : ''}`} onClick={() => setHeroSlide(i)} />
-          ))}
-        </div>
-      </section>
+        <div className="bk-hero-emojis">🥦🍅🥕🥚🍎🥒</div>
+      </div>
 
-      {/* ── Categories ── */}
-      <section className="hp-section">
-        <div className="hp-section-head">
-          <h2>Shop by Category</h2>
-          <Link to="/browse" className="hp-see-all">See all <ChevronRight size={16} /></Link>
-        </div>
-        <div className="hp-categories">
+      {/* ── Promo Cards Row ── */}
+      <div className="bk-promos">
+        {promoCards.map((card, i) => (
+          <Link to="/browse" key={i} className="bk-promo-card" style={{ background: card.bg }}>
+            <div className="bk-promo-text">
+              <h3>{card.title}</h3>
+              <p>{card.sub}</p>
+              <span className="bk-promo-cta">{card.cta}</span>
+            </div>
+            <span className="bk-promo-emojis">{card.emoji}</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* ── Category Grid ── */}
+      <div className="bk-categories-section">
+        <div className="bk-categories-grid">
           {categories.map(c => (
-            <Link to={`/browse?cat=${c.id}`} key={c.id} className="hp-cat">
-              <div className="hp-cat-icon">{c.icon}</div>
-              <span>{c.label}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Promo Cards ── */}
-      <section className="hp-section">
-        <div className="hp-section-head">
-          <h2>Today's Deals</h2>
-        </div>
-        <div className="hp-promos">
-          {promoCards.map((card, i) => (
-            <Link to="/browse" key={i} className={`hp-promo hp-promo-${i + 1}`}>
-              <div className="hp-promo-badge">{card.discount}</div>
-              <div className="hp-promo-emoji">{card.emoji}</div>
-              <div className="hp-promo-content">
-                <h3>{card.title}</h3>
-                <p>{card.sub}</p>
-                <span className="hp-promo-cta">Order Now <ChevronRight size={14} /></span>
+            <Link to={`/browse?cat=${c.id}`} key={c.id} className="bk-category-item">
+              <div className="bk-category-circle" style={{ background: c.bg }}>
+                <span>{c.icon}</span>
               </div>
+              <span className="bk-category-label">{c.label}</span>
             </Link>
           ))}
         </div>
-      </section>
-
-      {/* ── Quick Actions ── */}
-      <section className="hp-section">
-        <div className="hp-section-head">
-          <h2>Quick Actions</h2>
-        </div>
-        <div className="hp-quick-grid">
-          <Link to="/voice" className="hp-quick">
-            <div className="hp-quick-icon-wrap"><Mic size={28} /></div>
-            <span className="hp-quick-label">Voice Order</span>
-            <span className="hp-quick-desc">Just speak it</span>
-          </Link>
-          <Link to="/scan" className="hp-quick">
-            <div className="hp-quick-icon-wrap"><Camera size={28} /></div>
-            <span className="hp-quick-label">Scan & Buy</span>
-            <span className="hp-quick-desc">Point camera</span>
-          </Link>
-          <Link to="/map" className="hp-quick">
-            <div className="hp-quick-icon-wrap"><MapIcon size={28} /></div>
-            <span className="hp-quick-label">Store Map</span>
-            <span className="hp-quick-desc">Find items</span>
-          </Link>
-          <Link to="/gesture" className="hp-quick">
-            <div className="hp-quick-icon-wrap"><Hand size={28} /></div>
-            <span className="hp-quick-label">Gestures</span>
-            <span className="hp-quick-desc">Hands-free</span>
-          </Link>
-        </div>
-      </section>
+      </div>
 
       {/* ── Trending Products ── */}
       {trending.length > 0 && (
-        <section className="hp-section">
-          <div className="hp-section-head">
-            <h2>🔥 Bestsellers</h2>
-            <Link to="/browse" className="hp-see-all">See all <ChevronRight size={16} /></Link>
+        <div className="bk-section">
+          <div className="bk-section-header">
+            <h2>Bestsellers</h2>
+            <Link to="/browse" className="bk-see-all">see all</Link>
           </div>
-          <div className="hp-products-scroll">
+          <div className="bk-product-scroll">
             {trending.map(p => (
-              <div key={p._id || p.id} className="hp-product">
-                <div className="hp-product-img">
-                  <span>{p.emoji || '🍔'}</span>
+              <div key={p._id || p.id} className="bk-product-card">
+                <div className="bk-product-img">
+                  <span>📦</span>
                   {p.mrp && p.mrp > (p.selling_price || p.price) && (
-                    <div className="hp-product-discount">
-                      {Math.round(((p.mrp - (p.selling_price || p.price)) / p.mrp) * 100)}% OFF
-                    </div>
+                    <span className="bk-discount">{Math.round(((p.mrp - (p.selling_price || p.price)) / p.mrp) * 100)}%<br/>OFF</span>
                   )}
                 </div>
-                <div className="hp-product-info">
-                  <div className="hp-product-name">{p.name || 'Item'}</div>
-                  <div className="hp-product-unit">{p.unit || '1 unit'}</div>
-                  <div className="hp-product-footer">
-                    <div className="hp-product-prices">
-                      <span className="hp-price">₹{p.selling_price || p.price}</span>
+                <div className="bk-product-body">
+                  <div className="bk-product-name">{p.name || 'Item'}</div>
+                  <div className="bk-product-unit">{p.unit || '1 unit'}</div>
+                  <div className="bk-product-bottom">
+                    <div className="bk-product-prices">
+                      <span className="bk-price">₹{p.selling_price || p.price}</span>
                       {p.mrp && p.mrp > (p.selling_price || p.price) && (
-                        <span className="hp-mrp">₹{p.mrp}</span>
+                        <span className="bk-mrp">₹{p.mrp}</span>
                       )}
                     </div>
-                    <button className="hp-add-btn" onClick={() => handleAdd(p)}>
-                      <Plus size={16} />
-                      ADD
-                    </button>
+                    <button className="bk-add-btn" onClick={() => handleAdd(p)}>ADD</button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
 
-      {/* ── Login Prompt ── */}
+      {/* Quick Actions for accessibility (kiosk-specific) */}
+      <div className="bk-section">
+        <h2 className="bk-section-title">Quick Actions</h2>
+        <div className="bk-quick-grid">
+          <Link to="/voice" className="bk-quick-btn">
+            <span className="bk-quick-icon">🎙️</span>
+            <span>Voice Order</span>
+          </Link>
+          <Link to="/scan" className="bk-quick-btn">
+            <span className="bk-quick-icon">📷</span>
+            <span>Scan & Buy</span>
+          </Link>
+          <Link to="/map" className="bk-quick-btn">
+            <span className="bk-quick-icon">🗺️</span>
+            <span>Find in Store</span>
+          </Link>
+          <Link to="/gesture" className="bk-quick-btn">
+            <span className="bk-quick-icon">🤌</span>
+            <span>Gestures</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Login Prompt */}
       {role === 'guest' && (
-        <section className="hp-login-bar" onClick={openAuthModal}>
-          <div className="hp-login-text">
-            <div className="hp-login-icon-wrap">
-              <Star size={20} fill="currentColor" />
-            </div>
-            <div>
-              <strong>Sign in for rewards</strong>
-              <span>History, points & re-order</span>
-            </div>
-          </div>
-          <ChevronRight size={24} className="hp-login-arrow" />
-        </section>
+        <div className="bk-login-bar" onClick={openAuthModal}>
+          <span>🌟 <strong>Sign in</strong> for order history, points & instant re-order</span>
+          <span className="bk-login-arrow">→</span>
+        </div>
       )}
 
-      {/* ── Role dashboards ── */}
+      {/* Role dashboards */}
       {(role === 'supervisor' || role === 'owner') && (
-        <Link to={role === 'owner' ? '/owner' : '/supervisor'} className="hp-dashboard-btn">
+        <Link to={role === 'owner' ? '/owner' : '/supervisor'} className="bk-dashboard-btn">
           🔐 {role === 'owner' ? 'Owner Dashboard' : 'Supervisor Panel'}
         </Link>
       )}

@@ -2,42 +2,30 @@ import { useState, useEffect } from 'react'
 import { useStore } from '../../store/useStore'
 import { useSearchParams } from 'react-router-dom'
 import { inventoryAPI } from '../../services/api'
-import { useToast } from '../../components/ui/Toast'
 
 const categories = [
-  { id: 'burgers', icon: '🍔', label: 'Burgers', gradient: 'linear-gradient(135deg, #f6d365, #fda085)' },
-  { id: 'pizza', icon: '🍕', label: 'Pizza', gradient: 'linear-gradient(135deg, #f093fb, #f5576c)' },
-  { id: 'sides', icon: '🍟', label: 'Sides', gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)' },
-  { id: 'beverages', icon: '🥤', label: 'Drinks', gradient: 'linear-gradient(135deg, #43e97b, #38f9d7)' },
-  { id: 'desserts', icon: '🍦', label: 'Desserts', gradient: 'linear-gradient(135deg, #fa709a, #fee140)' },
-  { id: 'combo', icon: '🍱', label: 'Combos', gradient: 'linear-gradient(135deg, #fccb90, #d57eeb)' },
-  { id: 'hot_drinks', icon: '☕', label: 'Coffee', gradient: 'linear-gradient(135deg, #a18cd1, #fbc2eb)' },
-  { id: 'healthy', icon: '🥗', label: 'Healthy', gradient: 'linear-gradient(135deg, #ffecd2, #fcb69f)' },
+  { id: 'grains', icon: '🌾', label: 'Grains', gradient: 'linear-gradient(135deg, #f6d365, #fda085)' },
+  { id: 'pulses', icon: '🫘', label: 'Pulses', gradient: 'linear-gradient(135deg, #f093fb, #f5576c)' },
+  { id: 'oils', icon: '🫒', label: 'Oils', gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)' },
+  { id: 'dairy', icon: '🥛', label: 'Dairy', gradient: 'linear-gradient(135deg, #43e97b, #38f9d7)' },
+  { id: 'bakery', icon: '🍞', label: 'Bakery', gradient: 'linear-gradient(135deg, #fa709a, #fee140)' },
+  { id: 'beverages', icon: '🍵', label: 'Drinks', gradient: 'linear-gradient(135deg, #fccb90, #d57eeb)' },
+  { id: 'snacks', icon: '🍪', label: 'Snacks', gradient: 'linear-gradient(135deg, #a18cd1, #fbc2eb)' },
+  { id: 'essentials', icon: '🧂', label: 'Kitchen', gradient: 'linear-gradient(135deg, #ffecd2, #fcb69f)' },
+  { id: 'personal_care', icon: '🧴', label: 'Care', gradient: 'linear-gradient(135deg, #89f7fe, #66a6ff)' },
 ]
 
 const catMatchMap: Record<string, string[]> = {
-  burgers: ['burger', 'wrap', 'sandwich', 'bun'],
-  pizza: ['pizza', 'pasta'],
-  sides: ['fries', 'garlic', 'side', 'nugget', 'wings'],
-  beverages: ['cola', 'drink', 'beverage', 'water', 'coffee', 'shake'],
-  desserts: ['ice cream', 'sundae', 'cake', 'brownie', 'sweet'],
-  combo: ['combo', 'meal'],
-  hot_drinks: ['coffee', 'tea', 'hot'],
-  healthy: ['salad', 'soup', 'fresh'],
+  grains: ['rice', 'flour', 'grain', 'atta', 'wheat'],
+  pulses: ['dal', 'pulse', 'beans', 'lentil', 'chana'],
+  oils: ['oil', 'ghee'],
+  dairy: ['dairy', 'milk', 'cheese', 'curd', 'paneer', 'butter'],
+  bakery: ['bakery', 'bread', 'bun', 'cake'],
+  beverages: ['beverage', 'tea', 'coffee', 'drink', 'juice'],
+  snacks: ['snack', 'biscuit', 'chips', 'namkeen', 'cookie'],
+  personal_care: ['personal', 'care', 'soap', 'shampoo', 'toothpaste'],
+  essentials: ['spice', 'salt', 'sugar', 'masala', 'turmeric'],
 }
-
-const mockFoodProducts = [
-  { _id: '1', name: 'Classic Cheeseburger', category: 'burgers', selling_price: 149, mrp: 199, unit: '1 pc', emoji: '🍔' },
-  { _id: '2', name: 'Crispy Veg Burger', category: 'burgers', selling_price: 99, mrp: 129, unit: '1 pc', emoji: '🍔' },
-  { _id: '3', name: 'Margherita Pizza', category: 'pizza', selling_price: 299, mrp: 399, unit: '8 inch', emoji: '🍕' },
-  { _id: '4', name: 'Pepperoni Pizza', category: 'pizza', selling_price: 349, mrp: 449, unit: '8 inch', emoji: '🍕' },
-  { _id: '5', name: 'French Fries (L)', category: 'sides', selling_price: 99, mrp: 129, unit: '1 portion', emoji: '🍟' },
-  { _id: '6', name: 'Garlic Bread', category: 'sides', selling_price: 89, mrp: 109, unit: '4 pcs', emoji: '🥖' },
-  { _id: '7', name: 'Cold Coffee', category: 'beverages', selling_price: 129, mrp: 159, unit: '350 ml', emoji: '🥤' },
-  { _id: '8', name: 'Coca Cola', category: 'beverages', selling_price: 60, mrp: 75, unit: '300 ml', emoji: '🥤' },
-  { _id: '9', name: 'Chocolate Sundae', category: 'desserts', selling_price: 119, mrp: 149, unit: '1 portion', emoji: '🍨' },
-  { _id: '10', name: 'Mega Combo Meal', category: 'combo', selling_price: 399, mrp: 549, unit: 'Serves 2', emoji: '🍱' },
-]
 
 export default function BrowsePage() {
   const [searchParams] = useSearchParams()
@@ -55,14 +43,8 @@ export default function BrowsePage() {
     async function load() {
       try {
         const res = await inventoryAPI.listProducts()
-        if (res.data && res.data.length > 0) {
-          setProducts(res.data)
-        } else {
-          setProducts(mockFoodProducts)
-        }
-      } catch {
-        setProducts(mockFoodProducts)
-      } finally { setLoading(false) }
+        setProducts(res.data || [])
+      } catch { /* empty */ } finally { setLoading(false) }
     }
     load()
   }, [])
@@ -75,16 +57,13 @@ export default function BrowsePage() {
     return matchesCat && matchesSearch
   })
 
-  const { addToast } = useToast()
-
   const handleAdd = (product: any) => {
     const pid = product._id || product.id
     addToCart({
-      product_id: pid, product_name: product.name, product_emoji: product.emoji || getCatEmoji(product),
+      product_id: pid, product_name: product.name, product_emoji: '📦',
       quantity: 1, unit_price: product.selling_price || product.price,
       total_price: product.selling_price || product.price, added_via: 'manual',
     })
-    addToast({ title: `${product.emoji || getCatEmoji(product)} ${product.name} added`, message: `₹${product.selling_price || product.price} · Added to cart`, type: 'success', duration: 2500 })
     setAddedIds(prev => new Set(prev).add(pid))
     setTimeout(() => setAddedIds(prev => { const n = new Set(prev); n.delete(pid); return n }), 1500)
   }
@@ -102,7 +81,7 @@ export default function BrowsePage() {
     for (const c of categories) {
       if ((catMatchMap[c.id] || []).some(k => cat.includes(k))) return c.icon
     }
-    return '🍔'
+    return '📦'
   }
 
   return (
