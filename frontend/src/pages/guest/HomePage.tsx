@@ -107,14 +107,14 @@ export default function HomePage() {
       </section>
 
       {/* ── Categories ── */}
-      <section className="hp-section">
+      <section className="hp-section anim-slide">
         <div className="hp-section-head">
           <h2>Shop by Category</h2>
           <Link to="/browse" className="hp-see-all">See all <ChevronRight size={16} /></Link>
         </div>
-        <div className="hp-categories">
+        <div className="hp-categories stagger">
           {categories.map(c => (
-            <Link to={`/browse?cat=${c.id}`} key={c.id} className="hp-cat">
+            <Link to={`/browse?cat=${c.id}`} key={c.id} className="hp-cat anim-scale">
               <div className="hp-cat-icon">{c.icon}</div>
               <span>{c.label}</span>
             </Link>
@@ -123,13 +123,13 @@ export default function HomePage() {
       </section>
 
       {/* ── Promo Cards ── */}
-      <section className="hp-section">
+      <section className="hp-section anim-slide" style={{ animationDelay: '0.1s' }}>
         <div className="hp-section-head">
           <h2>Today's Deals</h2>
         </div>
-        <div className="hp-promos">
+        <div className="hp-promos stagger">
           {promoCards.map((card, i) => (
-            <Link to="/browse" key={i} className={`hp-promo hp-promo-${i + 1}`}>
+            <Link to="/browse" key={i} className={`hp-promo hp-promo-${i + 1} anim-scale`}>
               <div className="hp-promo-badge">{card.discount}</div>
               <div className="hp-promo-emoji">{card.emoji}</div>
               <div className="hp-promo-content">
@@ -143,27 +143,27 @@ export default function HomePage() {
       </section>
 
       {/* ── Quick Actions ── */}
-      <section className="hp-section">
+      <section className="hp-section anim-slide" style={{ animationDelay: '0.2s' }}>
         <div className="hp-section-head">
           <h2>Quick Actions</h2>
         </div>
-        <div className="hp-quick-grid">
-          <Link to="/voice" className="hp-quick">
+        <div className="hp-quick-grid stagger">
+          <Link to="/voice" className="hp-quick anim-scale">
             <div className="hp-quick-icon-wrap"><Mic size={28} /></div>
             <span className="hp-quick-label">Voice Order</span>
             <span className="hp-quick-desc">Just speak it</span>
           </Link>
-          <Link to="/scan" className="hp-quick">
+          <Link to="/scan" className="hp-quick anim-scale">
             <div className="hp-quick-icon-wrap"><Camera size={28} /></div>
             <span className="hp-quick-label">Scan & Buy</span>
             <span className="hp-quick-desc">Point camera</span>
           </Link>
-          <Link to="/map" className="hp-quick">
+          <Link to="/map" className="hp-quick anim-scale">
             <div className="hp-quick-icon-wrap"><MapIcon size={28} /></div>
             <span className="hp-quick-label">Store Map</span>
             <span className="hp-quick-desc">Find items</span>
           </Link>
-          <Link to="/gesture" className="hp-quick">
+          <Link to="/gesture" className="hp-quick anim-scale">
             <div className="hp-quick-icon-wrap"><Hand size={28} /></div>
             <span className="hp-quick-label">Gestures</span>
             <span className="hp-quick-desc">Hands-free</span>
@@ -173,14 +173,14 @@ export default function HomePage() {
 
       {/* ── Trending Products ── */}
       {trending.length > 0 && (
-        <section className="hp-section">
+        <section className="hp-section anim-slide" style={{ animationDelay: '0.3s' }}>
           <div className="hp-section-head">
             <h2>🔥 Bestsellers</h2>
             <Link to="/browse" className="hp-see-all">See all <ChevronRight size={16} /></Link>
           </div>
-          <div className="hp-products-scroll">
-            {trending.map(p => (
-              <div key={p._id || p.id} className="hp-product">
+          <div className="hp-products-scroll stagger">
+            {trending.map((p, i) => (
+              <div key={p._id || p.id} className="hp-product anim-scale" style={{ animationDelay: `${0.4 + i * 0.05}s` }}>
                 <div className="hp-product-img">
                   <span>{p.emoji || '🍔'}</span>
                   {p.mrp && p.mrp > (p.selling_price || p.price) && (

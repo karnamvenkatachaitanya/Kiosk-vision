@@ -2,9 +2,31 @@ import { useStore } from '../../store/useStore'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useToast } from '../ui/Toast'
+import { 
+  Search, 
+  ShoppingCart, 
+  User, 
+  Menu, 
+  Moon, 
+  Sun, 
+  Type,
+  LogOut
+} from 'lucide-react'
 
 export default function TopBar() {
-  const { isHighContrast, isLargeText, toggleHighContrast, toggleLargeText, cartItems, isAuthenticated, openAuthModal, toggleMobileMenu } = useStore()
+  const { 
+    isHighContrast, 
+    isLargeText, 
+    toggleHighContrast, 
+    toggleLargeText, 
+    cartItems, 
+    isAuthenticated, 
+    openAuthModal, 
+    toggleMobileMenu,
+    userName,
+    logout
+  } = useStore()
+  
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const { addToast } = useToast()
@@ -14,10 +36,10 @@ export default function TopBar() {
     if (searchQuery.trim()) navigate(`/browse?q=${encodeURIComponent(searchQuery)}`)
   }
 
-  const handleToggleAccessibility = (label: string, toggle: () => void, active: boolean) => {
-    toggle()
+  const handleToggleTheme = () => {
+    toggleHighContrast()
     addToast({
-      title: `${label} ${!active ? 'enabled' : 'disabled'}`,
+      title: !isHighContrast ? 'Midnight Mode enabled' : 'Light Mode enabled',
       type: 'info',
       duration: 1500
     })
@@ -41,23 +63,48 @@ export default function TopBar() {
         </div>
 
         {/* Search Bar */}
-        <form className="bk-search" onSubmit={handleSearch}>
-          <span className="bk-search-icon">🔍</span>
-          <input type="text" placeholder='Search "bread"' value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)} className="bk-search-input" />
+        <form className="bk-search-bar" onSubmit={handleSearch}>
+          <Search size={18} className="bk-search-icon" />
+          <input type="text" placeholder='Search items...' value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)} />
         </form>
 
         {/* Right side */}
         <div className="bk-topbar-right">
           <div className="bk-a11y-toggles">
-            <button className={`bk-a11y ${isHighContrast ? 'on' : ''}`} onClick={() => handleToggleAccessibility('High Contrast', toggleHighContrast, isHighContrast)} title="High Contrast">◐</button>
-            <button className={`bk-a11y ${isLargeText ? 'on' : ''}`} onClick={() => handleToggleAccessibility('Large Text', toggleLargeText, isLargeText)} title="Large Text">A+</button>
+            <button 
+              className={`bk-a11y-btn ${isHighContrast ? 'active' : ''}`} 
+              onClick={handleToggleTheme}
+              title={isHighContrast ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isHighContrast ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button 
+              className={`bk-a11y-btn ${isLargeText ? 'active' : ''}`} 
+              onClick={toggleLargeText}
+              title="Toggle Large Text"
+            >
+              <Type size={20} />
+            </button>
           </div>
-          {!isAuthenticated && (
-            <button className="bk-login-btn" onClick={openAuthModal}>Login</button>
+          
+          {isAuthenticated ? (
+            <div className="bk-user-menu">
+              <span className="bk-user-name">Hi, {userName?.split(' ')[0]}</span>
+              <button className="bk-icon-btn" onClick={logout} title="Logout">
+                <LogOut size={20} />
+              </button>
+            </div>
+          ) : (
+            <button className="bk-login-btn" onClick={openAuthModal}>
+              <User size={18} />
+              Login
+            </button>
           )}
-          <Link to="/cart" className="bk-cart-btn">
-            🛒 <span>My Cart</span>
+
+          <Link to="/cart" className="bk-cart-pill">
+            <ShoppingCart size={20} />
+            <span className="bk-cart-label">My Cart</span>
             {cartItems.length > 0 && <span className="bk-cart-count">{cartItems.length}</span>}
           </Link>
         </div>

@@ -35,11 +35,14 @@ import { useEffect } from 'react'
 function App() {
   const { role, isHighContrast, isLargeText } = useStore()
 
-  // Restore accessibility on mount
+  // Reactive accessibility effects
   useEffect(() => {
-    if (isHighContrast) document.body.classList.add('high-contrast')
-    if (isLargeText) document.body.classList.add('large-text')
-  }, [])
+    document.body.classList.toggle('high-contrast', isHighContrast)
+  }, [isHighContrast])
+
+  useEffect(() => {
+    document.body.classList.toggle('large-text', isLargeText)
+  }, [isLargeText])
 
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

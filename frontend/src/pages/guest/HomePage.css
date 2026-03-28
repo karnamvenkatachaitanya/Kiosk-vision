@@ -192,20 +192,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1.25rem 0.5rem;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem 0.5rem;
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(0,0,0,0.05); /* Subtle border for visibility */
   border-radius: var(--radius-lg);
+  text-align: center;
   text-decoration: none;
   transition: all var(--duration) var(--ease);
 }
 
 .hp-cat:hover {
-  border-color: #000;
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-hover);
-  background: #fafafa;
+  border-color: rgba(0,0,0,0.15);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  background: #fff;
 }
 
 .hp-cat-icon {
@@ -219,11 +221,12 @@
 }
 
 .hp-cat span {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #111111; /* Explicit black */
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  line-height: 1;
 }
 
 /* ─── Promo Cards ─── */
@@ -246,11 +249,13 @@
   overflow: hidden;
   transition: all var(--duration) var(--ease);
   min-height: 180px;
+  border: 1px solid transparent;
 }
 
 .hp-promo:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.18); /* Stronger shadow for separation */
+  border-color: rgba(255,255,255,0.1);
 }
 
 .hp-promo-1 {
@@ -333,10 +338,10 @@
 }
 
 .hp-quick:hover {
-  border-color: #000;
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-hover);
-  background: #fafafa;
+  border-color: rgba(0,0,0,0.15);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  background: #fff;
 }
 
 .hp-quick-icon-wrap {
@@ -363,16 +368,18 @@
 }
 
 .hp-quick-label {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #111111; /* Explicit black */
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
 }
 
 .hp-quick-desc {
-  font-size: 0.6rem;
-  color: var(--text-muted);
+  font-size: 0.65rem;
+  color: #555555;
+  font-weight: 500;
 }
 
 /* ─── Products Scroll ─── */
@@ -401,12 +408,14 @@
   scroll-snap-align: start;
   transition: all var(--duration) var(--ease);
   overflow: hidden;
+  cursor: pointer;
 }
 
 .hp-product:hover {
-  border-color: #111111;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-color: rgba(0,0,0,0.15);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  background: #fff;
 }
 
 .hp-product-img {
