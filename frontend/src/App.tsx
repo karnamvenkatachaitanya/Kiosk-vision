@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useStore } from './store/useStore'
 import TopBar from './components/layout/TopBar'
-import BottomNav from './components/layout/BottomNav'
+import Sidebar from './components/layout/Sidebar'
 import VoiceFAB from './components/voice/VoiceFAB'
 import VoiceOverlay from './components/voice/VoiceOverlay'
 import AuthModal from './components/auth/AuthModal'
+import { ToastProvider } from './components/ui/Toast'
 
 /* ── Guest / Customer Pages ── */
 import HomePage from './pages/guest/HomePage'
@@ -42,10 +43,13 @@ function App() {
 
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <ToastProvider>
       <div className="app-shell">
-        <TopBar />
-        <main className="page-content">
-          <Routes>
+        <Sidebar />
+        <div className="main-wrapper">
+          <TopBar />
+          <main className="page-content">
+            <Routes>
             {/* ── Guest & Customer ── */}
             <Route path="/" element={<HomePage />} />
             <Route path="/browse" element={<BrowsePage />} />
@@ -77,11 +81,12 @@ function App() {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
-        <BottomNav />
+        </div>
         <VoiceFAB />
         <VoiceOverlay />
         <AuthModal />
       </div>
+      </ToastProvider>
     </BrowserRouter>
   )
 }
