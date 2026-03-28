@@ -1,7 +1,23 @@
 import { useStore } from '../../store/useStore'
+import { useToast } from '../../components/ui/Toast'
 
 export default function ProfilePage() {
   const { role, userName, rewardPoints, logout, isHighContrast, isLargeText, toggleHighContrast, toggleLargeText } = useStore()
+  const { addToast } = useToast()
+
+  const handleLogout = () => {
+    logout()
+    addToast({ title: 'Logged out', message: 'You have been successfully signed out', type: 'info', duration: 3000 })
+  }
+
+  const handleToggleAccessibility = (label: string, toggle: () => void, active: boolean) => {
+    toggle()
+    addToast({
+      title: `${label} ${!active ? 'enabled' : 'disabled'}`,
+      type: 'info',
+      duration: 2000
+    })
+  }
 
   return (
     <div className="anim-slide">
@@ -41,7 +57,7 @@ export default function ProfilePage() {
               <span style={{ fontSize: '1.2rem', width: '30px', textAlign: 'center' }}>{s.icon}</span>
               <span style={{ fontWeight: 600 }}>{s.label}</span>
             </span>
-            <button onClick={s.toggle} style={{
+            <button onClick={() => handleToggleAccessibility(s.label, s.toggle, s.active)} style={{
               width: '48px', height: '28px', borderRadius: '14px',
               background: s.active ? 'var(--accent-blue)' : 'var(--bg-elevated)',
               border: '1.5px solid var(--border)', padding: '2px', cursor: 'pointer',
@@ -62,7 +78,7 @@ export default function ProfilePage() {
           📱 Register with Phone
         </button>
       ) : (
-        <button className="btn btn-danger btn-full mt-2" onClick={logout}>
+        <button className="btn btn-danger btn-full mt-2" onClick={handleLogout}>
           🚪 Logout
         </button>
       )}

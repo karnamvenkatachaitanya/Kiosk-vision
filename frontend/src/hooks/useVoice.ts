@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { aiAPI, inventoryAPI } from '../services/api'
+import { useToast } from '../components/ui/Toast'
 
 // ─────────────────────────────────────────────
 // TTS Voice Pre-caching
@@ -162,6 +163,7 @@ async function handleVoiceCommand(
   setTranscript: (text: string) => void,
   setIntent: (intent: string) => void,
   navigate: ReturnType<typeof useNavigate>,
+  addToast: any,
 ): Promise<string> {
   let intent = 'unknown'
   let entities: any = {}
@@ -200,13 +202,14 @@ async function handleVoiceCommand(
           addToCart({
             product_id: product.id || product._id,
             product_name: product.name,
-            product_emoji: '📦',
+            product_emoji: product.emoji || '📦',
             quantity: qty,
             unit_price: product.selling_price || product.price,
             total_price: (product.selling_price || product.price) * qty,
             added_via: 'voice',
           })
           addedNames.push(product.name)
+          addToast({ title: `${product.emoji || '📦'} ${product.name} added`, message: `Added ${qty} unit(s) via voice`, type: 'success', duration: 3000 })
         }
       }
     } catch {
@@ -229,6 +232,7 @@ async function handleVoiceCommand(
       removeFromCart(hit.product_id)
       responseText = `Removed ${hit.product_name} from your cart.`
       setTranscript(`🗑️ Removed ${hit.product_name}`)
+      addToast({ title: `${hit.product_emoji} ${hit.product_name} removed`, message: 'Removed via voice command', type: 'error', duration: 3000 })
     } else {
       responseText = `I couldn't find ${entities.product_name} in your cart to remove.`
       setTranscript(`❌ "${entities.product_name}" is not in your cart`)
@@ -292,6 +296,7 @@ export function useVoice() {
   const navigate = useNavigate()
 
   const { setTranscript, setIntent, addToCart, closeVoiceOverlay } = useStore()
+  const { addToast } = useToast()
 
   const startRecording = useCallback(async () => {
     try {
@@ -323,7 +328,7 @@ export function useVoice() {
 
         try {
           // Process the voice command (handles backend + offline fallback)
-          const feedbackText = await handleVoiceCommand(text, addToCart, setTranscript, setIntent, navigate)
+          const feedbackText = await handleVoiceCommand(text, addToCart, setTranscript, setIntent, navigate, addToast)
 
           setIsProcessing(false)
 

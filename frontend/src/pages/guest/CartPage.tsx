@@ -1,10 +1,22 @@
 import { useStore } from '../../store/useStore'
 import { Link } from 'react-router-dom'
+import { useToast } from '../../components/ui/Toast'
 
 export default function CartPage() {
   const { cartItems, cartTotal, updateQuantity, removeFromCart, clearCart } = useStore()
+  const { addToast } = useToast()
   const tax = Math.round(cartTotal * 0.05)
   const total = cartTotal + tax
+
+  const handleRemove = (item: any) => {
+    removeFromCart(item.product_id)
+    addToast({ title: `${item.product_emoji} ${item.product_name} removed`, type: 'error', duration: 2500 })
+  }
+
+  const handleClear = () => {
+    clearCart()
+    addToast({ title: 'Cart cleared', message: 'All items removed from cart', type: 'warning', duration: 3000 })
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -45,7 +57,7 @@ export default function CartPage() {
           <div style={{ textAlign: 'right' }}>
             <div className="product-price">₹{item.total_price}</div>
             <button style={{ fontSize: '0.7rem', color: 'var(--accent-red)', marginTop: '0.3rem' }}
-              onClick={() => removeFromCart(item.product_id)}>Remove</button>
+              onClick={() => handleRemove(item)}>Remove</button>
           </div>
         </div>
       ))}
@@ -73,7 +85,7 @@ export default function CartPage() {
         <Link to="/checkout" className="btn btn-success btn-xl btn-full btn-icon">
           ✅ Checkout — ₹{total}
         </Link>
-        <button className="btn btn-outline btn-full" onClick={clearCart}>🗑️ Clear Cart</button>
+        <button className="btn btn-outline btn-full" onClick={handleClear}>🗑️ Clear Cart</button>
       </div>
     </div>
   )

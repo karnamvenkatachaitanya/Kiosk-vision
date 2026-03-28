@@ -30,6 +30,7 @@ export interface AppState {
   deliveryType: DeliveryType
 
   /* UI / Accessibility */
+  isMobileMenuOpen: boolean
   isVoiceActive: boolean
   isVoiceOverlayOpen: boolean
   isHighContrast: boolean
@@ -58,6 +59,8 @@ export interface AppState {
   toggleVoice: () => void
   toggleHighContrast: () => void
   toggleLargeText: () => void
+  toggleMobileMenu: () => void
+  closeMobileMenu: () => void
   setTranscript: (text: string) => void
   setIntent: (intent: string) => void
   setRewardPoints: (pts: number) => void
@@ -80,6 +83,7 @@ export const useStore = create<AppState>((set, get) => ({
   deliveryType: 'pickup',
 
   /* ── UI ── */
+  isMobileMenuOpen: false,
   isVoiceActive: false,
   isVoiceOverlayOpen: false,
   isHighContrast: localStorage.getItem('kv_hc') === '1',
@@ -163,6 +167,9 @@ export const useStore = create<AppState>((set, get) => ({
     localStorage.setItem('kv_lt', next ? '1' : '0')
     set({ isLargeText: next })
   },
+
+  toggleMobileMenu: () => set({ isMobileMenuOpen: !get().isMobileMenuOpen }),
+  closeMobileMenu: () => set({ isMobileMenuOpen: false }),
 
   setTranscript: (text) => set({ lastTranscript: text }),
   setIntent: (intent) => set({ lastIntent: intent }),
